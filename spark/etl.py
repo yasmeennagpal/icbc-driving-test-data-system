@@ -3,9 +3,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, trim, when, avg, count
 
-# -------------------------
-# 1. Spark Session
-# -------------------------
 spark = (
     SparkSession.builder
     .appName("ETL")
@@ -14,9 +11,7 @@ spark = (
 )
 
 
-# -------------------------
-# 2. Extract (CSV without header)
-# -------------------------
+
 input_path = "C:/Users/yasme/Downloads/drivingtests.csv"
 
 df = spark.read.csv(
@@ -40,9 +35,7 @@ df = df.toDF(
 print("✓ Data extracted")
 df.show(5)
 
-# -------------------------
-# 3. Transform (clean + enrich)
-# -------------------------
+
 df_clean = (
     df
     .withColumn("Location", trim(col("Location")))
@@ -55,10 +48,6 @@ df_clean = (
 
 print("✓ Data cleaned and enriched")
 df_clean.show(5)
-
-# -------------------------
-# 4. Analytics
-# -------------------------
 
 # Pass rate by location
 pass_rate_by_location = (
@@ -97,9 +86,6 @@ highest_pass_rate_city = pass_rate_by_location.orderBy(desc("PassRate")).limit(1
 print("City with highest pass rate")
 highest_pass_rate_city.show()
 
-# -------------------------
-# 5. Load (write outputs)
-# -------------------------
 output_base = "output"
 
 df_clean.write.mode("overwrite").parquet("output/cleaned")
