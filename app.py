@@ -7,50 +7,45 @@ st.title("🚗 ICBC Driving Test Performance Dashboard")
 
 @st.cache_data
 def load_data():
-    return pd.DataFrame({
-        "Year": [2021, 2022, 2023, 2023, 2022, 2021],
-        "Test Type": ["Class 5", "Class 5", "Class 5", "Class 7", "Class 7", "Class 7"],
-        "Pass Rate (%)": [58, 61, 64, 45, 47, 49],
-        "Attempts": [120000, 130000, 140000, 90000, 95000, 98000]
-    })
+    return pd.read_csv("data/driving_tests_clean.csv")
 
 df = load_data()
 
+# Sidebar filters
 st.sidebar.header("Filters")
 
-year = st.sidebar.multiselect(
-    "Select Year(s)",
-    options=df["Year"].unique(),
-    default=list(df["Year"].unique())
+locations = st.sidebar.multiselect(
+    "Select Location(s)",
+    options=df["Location"].unique(),
+    default=list(df["Location"].unique())
 )
 
-test_type = st.sidebar.multiselect(
-    "Select Test Type",
-    options=df["Test Type"].unique(),
-    default=list(df["Test Type"].unique())
+result_filter = st.sidebar.multiselect(
+    "Result",
+    options=df["Result"].unique(),
+    default=list(df["Result"].unique())
 )
 
 filtered_df = df[
-    (df["Year"].isin(year)) &
-    (df["Test Type"].isin(test_type))
+    (df["Location"].isin(locations)) &
+    (df["Result"].isin(result_filter))
 ]
 
+# Metrics
 col1, col2, col3 = st.columns(3)
 
-col1.metric("Average Pass Rate (%)", f"{filtered_df['Pass Rate (%)'].mean():.1f}")
-col2.metric("Total Attempts", f"{filtered_df['Attempts'].sum():,}")
-col3.metric("Number of Records", len(filtered_df))
+pass_rate = (filtered_df["PassFlag"].sum() / len(filtered_df) * 100) if len(filtered_df) > 0 else 0
+col1.metric("Pass Rate", f"{pass_rate:.1f}%")
+col2.metric("Total Tests", len(filtered_df))
+col3.metric("Average Errors", f"{filtered_df['Errors'].mean():.2f}")
 
 st.divider()
 
-st.subheader("Pass Rate Trends")
-st.line_chart(
-    filtered_df.pivot_table(
-        index="Year",
-        columns="Test Type",
-        values="Pass Rate (%)"
-    )
-)
+# Pass rate by location
+st.subheader("📍 Pass Rate by Location")
+pass_by_location = filtered_df.groupby("Location")["PassFlag"].mean() * 100
+st.bar_chart(pass_by_location)
 
-st.subheader("Raw Data")
+# Raw data
+st.subheader("📋 Test Details")
 st.dataframe(filtered_df, use_container_width=True)

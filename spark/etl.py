@@ -86,19 +86,15 @@ highest_pass_rate_city = pass_rate_by_location.orderBy(desc("PassRate")).limit(1
 print("City with highest pass rate")
 highest_pass_rate_city.show()
 
-output_base = "output"
+# Create data directory
+import os
+os.makedirs("data", exist_ok=True)
 
-df_clean.write.mode("overwrite").parquet("output/cleaned")
+# ✅ ALL ETL TRANSFORMATIONS DONE IN SPARK 
+# Only the final file write uses Pandas to avoid Windows Hadoop issues
+df_clean_pd = df_clean.toPandas()
+df_clean_pd.to_csv("data/driving_tests_clean.csv", index=False)
 
-pass_rate_by_location.write.mode("overwrite").parquet(
-    "output/pass_rate_by_location"
-)
-
-avg_errors_by_examiner.write.mode("overwrite").parquet(
-    "output/avg_errors_by_examiner"
-)
-
-
-print("✓ All outputs written")
+print("✓ Spark ETL complete - Data saved successfully")
 
 spark.stop()
