@@ -3,23 +3,15 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, trim, when, avg, count
 
-
 spark = (
     SparkSession.builder
-    .appName(" Driving Test ETL")
+    .appName("ETL")
     .config("spark.hadoop.io.native.lib.available", "false")
-    .config("spark.sql.warehouse.dir", "file:///C:/temp/spark-warehouse") 
-    .config(
-        "spark.sql.sources.commitProtocolClass",
-        "org.apache.spark.sql.execution.datasources.SQLHadoopMapReduceCommitProtocol"
-    )
-    .config("spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version", "2")
     .getOrCreate()
 )
 
-# -------------------------
-# 2. Extract (CSV without header)
-# -------------------------
+
+
 input_path = "C:/Users/yasme/Downloads/drivingtests.csv"
 
 df = spark.read.csv(
@@ -40,12 +32,10 @@ df = df.toDF(
     "Timestamp"
 )
 
-print("Data extracted")
+print("✓ Data extracted")
 df.show(5)
 
-# -------------------------
-# 3. Transform (clean + enrich)
-# -------------------------
+
 df_clean = (
     df
     .withColumn("Location", trim(col("Location")))
@@ -56,12 +46,8 @@ df_clean = (
     )
 )
 
-print("Data cleaned and enriched")
+print("✓ Data cleaned and enriched")
 df_clean.show(5)
-
-# -------------------------
-# 4. Analytics
-# -------------------------
 
 # Pass rate by location
 pass_rate_by_location = (
@@ -73,7 +59,7 @@ pass_rate_by_location = (
     )
 )
 
-print("Pass rate by location")
+print("✓ Pass rate by location")
 pass_rate_by_location.show()
 
 # Average errors by examiner
@@ -83,7 +69,7 @@ avg_errors_by_examiner = (
     .agg(avg("Errors").alias("AvgErrors"))
 )
 
-print("Average errors by examiner")
+print("✓ Average errors by examiner")
 avg_errors_by_examiner.show()
 
 from pyspark.sql.functions import asc
@@ -100,23 +86,19 @@ highest_pass_rate_city = pass_rate_by_location.orderBy(desc("PassRate")).limit(1
 print("City with highest pass rate")
 highest_pass_rate_city.show()
 
-# -------------------------
-# 5. Load (write outputs)
-# -------------------------
-base_output = "file:///C:/temp/tests_outputs"
+output_base = "output"
 
-df_clean.coalesce(1).write.mode("overwrite").parquet(
-    f"{base_output}/cleaned_driving_tests"
-)
+df_clean.write.mode("overwrite").parquet("output/cleaned")
 
 pass_rate_by_location.write.mode("overwrite").parquet(
-    f"{base_output}/pass_rate_by_location"
+    "output/pass_rate_by_location"
 )
 
 avg_errors_by_examiner.write.mode("overwrite").parquet(
-    f"{base_output}/avg_errors_by_examiner"
+    "output/avg_errors_by_examiner"
 )
 
-print("All outputs written")
+
+print("✓ All outputs written")
 
 spark.stop()
