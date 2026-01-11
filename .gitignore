@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+spark_env/
+venv/
+env/
+
+# Streamlit
+.streamlit/secrets.toml
+.streamlit/cache/
+
+# Data files (if large)
+*.parquet
+*.csv
+data/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
