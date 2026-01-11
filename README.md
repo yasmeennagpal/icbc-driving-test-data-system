@@ -83,9 +83,30 @@ driving-test-data-platform/
 - Pass rate by city
 - Identification of lowest and highest pass-rate locations
 
+## Running the Dashboard
+
+To view the interactive Streamlit dashboard:
+
+1. Install dependencies:
+```bash
+pip install streamlit pandas
+```
+
+2. Run the dashboard:
+```bash
+streamlit run app.py
+```
+
+3. Open your browser to `http://localhost:8501`
+
+### Dashboard Features:
+- Interactive filters for Year and Test Type
+- Pass rate trends visualization
+- Key metrics (Average Pass Rate, Total Attempts, Number of Records)
+- Raw data table
+
 ## Future Enhancements
 
-- Interactive Streamlit dashboard
 - REST API for data access
 - Cloud deployment (Azure SQL + Azure App Service)
 
