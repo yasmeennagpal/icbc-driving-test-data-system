@@ -90,7 +90,7 @@ highest_pass_rate_city.show()
 import os
 os.makedirs("data", exist_ok=True)
 
-# ✅ ALL ETL TRANSFORMATIONS DONE IN SPARK 
+# ALL ETL TRANSFORMATIONS DONE IN SPARK 
 # Only the final file write uses Pandas to avoid Windows Hadoop issues
 df_clean_pd = df_clean.toPandas()
 df_clean_pd.to_csv("data/driving_tests_clean.csv", index=False)
