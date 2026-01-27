@@ -97,4 +97,4 @@ df_clean_pd.to_csv("data/driving_tests_clean.csv", index=False)
 
 print("✓ Spark ETL complete - Data saved successfully")
 
-spark.stop()
+spark.stop() 
